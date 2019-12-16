@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  url-looker:
+    image: node:12.13.0-alpine
+
+    volumes:
+      - ./:/app
+
+    network_mode: host
+
+    restart: always
+    command: node /app/bin.js

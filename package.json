@@ -1,0 +1,16 @@
+{
+  "name": "url-looker",
+  "version": "0.0.1",
+  "main": "src/service.js",
+  "repository": "https://github.com/GeekBerry/url-looker.git",
+  "author": "<geekberry@qq.com>",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "koaflow": "^0.2.14",
+    "koaflow-type": "^0.2.11",
+    "lodash": "^4.17.15",
+    "prome-string": "^0.0.8",
+    "superagent": "^5.1.2"
+  }
+}
