@@ -21,9 +21,13 @@ class App extends Koaflow {
   }
 
   listen() {
-    const port = this.config.port || 80;
+    const {
+      config: { port = 80, look = [] },
+    } = this;
 
     super.listen(port);
+    look.map(v => this.service.look(v)); // load const metric items
+
     console.log(`listen at ${port}`);
   }
 }

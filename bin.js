@@ -1,10 +1,6 @@
-const Bin = require('./src');
+const App = require('./src');
+const config = require('./config');
 
-const app = new Bin({
-  name: 'url_looker',
-  interval: 60,
-  percentiles: [0.5, 0.8, 0.9, 0.99],
-  port: 80,
-});
+const app = new App(config);
 
 app.listen();

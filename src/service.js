@@ -5,8 +5,9 @@ const { loop, request } = require('./utils');
 class Service {
   constructor({
     name,
-    interval = 60,
     percentiles = [0.5],
+    span = 24 * 3600,
+    interval = 60,
   } = {}) {
     if (!name) {
       throw new Error(`name is required, got "${name}"`);
@@ -19,8 +20,9 @@ class Service {
       name: name,
       help: `help of "${name}"`,
       labels: ['id', 'url', 'status'],
-      queueLength: 1000,
+      queueLength: Math.ceil(span / interval),
       percentiles,
+      timeout: span * 1000,
     });
   }
 
@@ -59,6 +61,7 @@ class Service {
         const { status = null } = await request(info) || {};
         const duration = Date.now() - timestamp;
         this._summary.set(duration, { id, url, status });
+        // console.log({ url, status, timestamp, duration });
       },
       interval || this.interval,
     );
