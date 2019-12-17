@@ -20,6 +20,25 @@ class SDK {
     }
   }
 
+  async load(filename) {
+    const lookList = require(filename);
+
+    const list = [];
+    for (const info of lookList) {
+      try {
+        list.push(await this.look(info));
+      } catch (e) {
+        // pass
+      }
+    }
+    return list;
+  }
+
+  async dump() {
+    const list = await this.list();
+    return Promise.all(list.map(id => this.get(id)));
+  }
+
   async look(info) {
     const { status, text } = await request({
       method: 'POST',

@@ -1,4 +1,5 @@
-const { Summary } = require('prome-string');
+const fs = require('fs');
+const { Summary, Gauge } = require('prome-string');
 const { loop, request } = require('./utils');
 
 // ============================================================================
@@ -8,26 +9,43 @@ class Service {
     percentiles = [0.5],
     span = 24 * 3600,
     interval = 60,
+    filename,
   } = {}) {
-    if (!name) {
-      throw new Error(`name is required, got "${name}"`);
-    }
-
     this.interval = interval;
+    this.filename = filename;
 
     this._table = {}; // {string:{handler:Object, info:object}, }
+
     this._summary = new Summary({
-      name: name,
+      name: `${name}_summary`,
       help: `help of "${name}"`,
       labels: ['id', 'url', 'status'],
       queueLength: Math.ceil(span / interval),
       percentiles,
       timeout: span * 1000,
     });
+
+    this._gauge = new Gauge({
+      name: `${name}_gauge`,
+      help: `help of "${name}"`,
+      labels: ['id', 'url', 'status'],
+    });
+  }
+
+  save() {
+    const lookList = Object.values(this._table).map(({ info }) => info);
+    fs.writeFileSync(this.filename, JSON.stringify(lookList, null, 2));
+  }
+
+  load(filename = this.filename) {
+    if(fs.existsSync(filename)) {
+      const lookList = require(filename);
+      lookList.map(v => this.look(v));
+    }
   }
 
   metrics() {
-    return this._summary.toString();
+    return [this._gauge, this._summary].join('\n');
   }
 
   list() {
@@ -44,6 +62,7 @@ class Service {
     if (handler) {
       handler.stop();
       delete this._table[id];
+      this.save();
     }
     return null;
   }
@@ -61,12 +80,14 @@ class Service {
         const { status = null } = await request(info) || {};
         const duration = Date.now() - timestamp;
         this._summary.set(duration, { id, url, status });
+        this._gauge.set(duration, { id, url, status });
         // console.log({ url, status, timestamp, duration });
       },
       interval || this.interval,
     );
 
     this._table[id] = { handler, info };
+    this.save();
     return id;
   }
 }

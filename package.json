@@ -9,7 +9,6 @@
   "dependencies": {
     "koaflow": "^0.2.14",
     "koaflow-type": "^0.2.11",
-    "lodash": "^4.17.15",
     "prome-string": "^0.0.8",
     "superagent": "^5.1.2"
   }

@@ -6,7 +6,6 @@ class App extends Koaflow {
   constructor(config = {}) {
     super();
 
-    this.config = config;
     this.service = new Service(config);
     this.router = router; // equal as `this.router.subRouter('', router);`
 
@@ -20,14 +19,9 @@ class App extends Koaflow {
     });
   }
 
-  listen() {
-    const {
-      config: { port = 80, look = [] },
-    } = this;
-
+  listen(port = 80) {
     super.listen(port);
-    look.map(v => this.service.look(v)); // load const metric items
-
+    this.service.load();
     console.log(`listen at ${port}`);
   }
 }
